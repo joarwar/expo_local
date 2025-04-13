@@ -1,74 +1,153 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, Text, Button, StyleSheet, View} from 'react-native';
+import { Card, ProgressBar } from 'react-native-paper'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { Link } from 'expo-router';
+import { Image } from 'expo-image';
+import { getDatabase, ref, set } from "firebase/database";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const database = getDatabase();
+
+const Stack = createStackNavigator();
+
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const [currentHR, setCurrentHR] = useState(80);
+  const [currentHRV, setCurrentHRV] = useState(30);
+  const [history, setHistory] = useState([]);
+
+
+
+  const stressLevel = currentHRV < 40 ? 'High Stress' : currentHRV < 60 ? 'Medium Stress' : 'Low Stress';
+  const stressColor = stressLevel === 'High Stress' ? '#ff2c9c' : stressLevel === 'Medium Stress' ? '#FFB74D' : '#66BB6A';
+
+  function writeUserData(userId, HR, HRV, timestamp) {
+    const db = getDatabase();
+    set(ref(db, 'users/' + userId), {
+      hearrate: HR,
+      variability: HRV,
+      date : timestamp
+    });
+  }
+  HR = currentHR;
+  
+
+  const hrProgress = (currentHR - 60) / 40; 
+  const hrvProgress = (currentHRV - 30) / 70; 
+  
+  
+  return (    
+  <SafeAreaView style={styles.container}>
+    <View style={styles.logoContainer}>
+      <Image 
+      source={require('@/assets/images/afry.png')}
+      style={styles.logo}
+      contentFit="cover" />
+    </View>
+    <Text style={styles.title}>Greta Grip</Text>
+    
+    {/* Heart Rate Display */}
+    <Card style={styles.card}>
+      <Text style={styles.cardTitle}>Heart Rate</Text>
+      <View style={styles.cardContentContainer}>
+        <Text style={styles.cardContent}>{currentHR} bpm</Text>
+        <ProgressBar progress={hrProgress} color="#6200EE" style={styles.progressBar} />
+      </View>
+    </Card>
+
+    {/* Heart Rate Variability Display */}
+    <Card style={styles.card}>
+      <Text style={styles.cardTitle}>Heart Rate Variability</Text>
+      <View style={styles.cardContentContainer}>
+        <Text style={styles.cardContent}>{currentHRV} ms</Text>
+        <ProgressBar progress={hrvProgress} color="#4CAF50" style={styles.progressBar} />
+      </View>
+    </Card>
+
+    {/* Stress Level Display */}
+    <Card style={[styles.card, { borderColor: stressColor }]}>
+      <Text style={styles.cardTitle}>Stress Level</Text>
+      <View style={styles.cardContentContainer}>
+        <Text style={[styles.cardContent, { color: stressColor }]}>{stressLevel}</Text>
+        <ProgressBar progress={hrvProgress} color={stressColor} style={styles.progressBar} />
+      </View>
+    </Card>
+
+    <View style={styles.buttonContainer}>
+      <Button title="Add Data" onPress={addNewData} color="#d69ae7" />
+      <Link href="./calendar" style={styles.button}>
+        History
+      </Link>
+      <Link href="./dailyquiz" style={styles.button}>
+        Daily quiz
+      </Link>
+    </View>
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    backgroundColor: '#f5f5f5',
+    padding: 20,
+  },
+  logoContainer: {
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  logo: {
+    width: 150,
+    height: 150,
+    resizeMode: 'contain',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: 20,
+  },
+  card: {
+    marginBottom: 16,
+    padding: 20,
+    borderWidth: 2,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    borderColor: '#ccc',
+    elevation: 5,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  cardContentContainer: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  cardContent: {
+    fontSize: 24,
+    color: '#555',
+  },
+  progressBar: {
+    width: '100%',
+    marginTop: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 12,
+  },
+  button: {
+    fontSize: 20,
+    textDecorationLine: 'underline',
+    color: '#d69ae7',
   },
 });
