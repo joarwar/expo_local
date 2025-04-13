@@ -13,7 +13,7 @@ type MarkedDates = {
   };
 };
 
-export default function AssetExample() {
+export default function History() {
   const [history, setHistory] = useState<any[]>([]);
   const [markedDates, setMarkedDates] = useState<MarkedDates>({});
 
@@ -35,7 +35,6 @@ export default function AssetExample() {
             };
           });
   
-          // Sort the entries by timestamp in descending order (latest first)
           entries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   
           setHistory(entries);
@@ -43,8 +42,8 @@ export default function AssetExample() {
           const marked: MarkedDates = {};
           entries.forEach(entry => {
             const date = new Date(entry.timestamp);
-            const dateString = date.toISOString().split('T')[0]; // Get the date in YYYY-MM-DD format
-            marked[dateString] = { selected: true, marked: true, selectedColor: '#A0D9D3' }; // Soft greenish-blue
+            const dateString = date.toISOString().split('T')[0]; 
+            marked[dateString] = { selected: true, marked: true, selectedColor: '#A0D9D3' }; 
           });
           setMarkedDates(marked);
         } else {
@@ -75,20 +74,18 @@ export default function AssetExample() {
     <View style={styles.container}>
       <Text style={styles.title}>View History by Date</Text>
       <Calendar
-        // Initially marked dates
         markedDates={markedDates}
-        // Handle day press
         onDayPress={(day: { dateString: string }) => {
           const selectedDate = day.dateString;
           const selectedEntries = history.filter(entry => entry.timestamp.startsWith(selectedDate));
           console.log('Selected Date:', selectedDate);
           console.log('Entries for this date:', selectedEntries);
         }}
-        monthFormat={'yyyy MM'}
+        monthFormat={'MMMM yyyy'}  
         theme={{
-          selectedDayBackgroundColor: '#A0D9D3', // Light greenish-blue
-          todayTextColor: '#2D6A4F', // A calming green
-          arrowColor: '#2D6A4F', // Green for the arrow
+          selectedDayBackgroundColor: '#A0D9D3', 
+          todayTextColor: '#2D6A4F', 
+          arrowColor: '#2D6A4F', 
         }}
       />
 
@@ -123,7 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#F4F4F9', // Soft light background color
+    backgroundColor: '#F4F4F9', 
     borderRadius: 12,
     elevation: 3,
   },
@@ -132,7 +129,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
-    color: '#2D6A4F', // Calming green for the title
+    color: '#2D6A4F', 
   },
   scrollContainer: {
     marginTop: 20,
@@ -142,7 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#A0D9D3', // Light greenish-blue border
+    borderColor: '#A0D9D3', 
     borderRadius: 10,
     backgroundColor: '#FFFFFF',
     shadowColor: '#000',
@@ -154,7 +151,7 @@ const styles = StyleSheet.create({
   historyTextDate: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2D6A4F', // Calming green color for the date
+    color: '#2D6A4F', 
     marginBottom: 8,
   },
   infoRow: {
@@ -182,7 +179,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#A0D9D3', // Light greenish-blue for the link
+    color: '#A0D9D3', 
     textAlign: 'center',
   },
 });
