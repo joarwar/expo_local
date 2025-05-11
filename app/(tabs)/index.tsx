@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, Button, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, Text, Button, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { Card, ProgressBar } from 'react-native-paper';
 import { Link } from 'expo-router';
 import { Image } from 'expo-image';
 import { ref, set, push } from "firebase/database";
 import { database } from '@/app/firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient'; 
+import { BleManager } from 'react-native-ble-plx';
+import { Buffer } from 'buffer';
+import { useBluetooth } from '../../hooks/useBluetooth';
 
 export default function HomeScreen() {
-  const [currentHR, setCurrentHR] = useState(80);
-  const [currentHRV, setCurrentHRV] = useState(30);
+  const {
+    heartRate,
+    heartRateVariability,
+  } = useBluetooth();
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const randomizedHR = Math.floor(Math.random() * (100 - 60 + 1)) + 60;
-      const randomizedHRV = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
-
-      setCurrentHR(randomizedHR);
-      setCurrentHRV(randomizedHRV);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  function writeUserData(userId: string, HR: number, HRV: number, timestamp: string) {
+  function writeUserData(userId: string, HR: number | null, HRV: number | null, timestamp: string) {
     const userRef = ref(database, 'users/' + userId);
     const newEntryRef = push(userRef); 
     set(newEntryRef, {
@@ -35,68 +28,84 @@ export default function HomeScreen() {
 
   const addNewData = () => {
     const timestamp = new Date().toISOString();
-    writeUserData("user_1", currentHR, currentHRV, timestamp);
+    writeUserData("user_1", heartRate, heartRateVariability, timestamp);
   };
 
-  const hrProgress = (currentHR - 60) / 40;
-  const hrvProgress = (currentHRV - 30) / 70;
+  const hrProgress = heartRate !== null ? (heartRate - 60) / 40 : 0;
+  const hrvProgress = heartRateVariability !== null ? (heartRateVariability - 30) / 70 : 0;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <LinearGradient
         colors={['#A0D9D3', '#B5E0E7']}
         style={styles.gradientBackground}
       >
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('@/assets/images/afry.png')}
-            style={styles.logo}
-            contentFit="cover"
-          />
-        </View>
-        <Text style={styles.title}>Greta Grip</Text>
-
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Heart Rate</Text>
-          <View style={styles.cardContentContainer}>
-            <Text style={styles.cardContent}>{currentHR} bpm</Text>
-            <ProgressBar progress={hrProgress} color="#A0D9D3" style={styles.progressBar} />
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('@/assets/images/afry.png')}
+              style={styles.logo}
+              contentFit="cover"
+            />
           </View>
-        </Card>
+          <Text style={styles.title}>Greta Grip</Text>
 
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Heart Rate Variability</Text>
-          <View style={styles.cardContentContainer}>
-            <Text style={styles.cardContent}>{currentHRV} ms</Text>
-            <ProgressBar progress={hrvProgress} color="#A0D9D3" style={styles.progressBar} />
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Heart Rate</Text>
+            <View style={styles.cardContentContainer}>
+              <Text style={styles.cardContent}>
+                {heartRate !== null ? `${heartRate} bpm` : 'No data sent yet'}
+              </Text>
+              <ProgressBar progress={hrProgress} color="#A0D9D3" style={styles.progressBar} />
+            </View>
+          </Card>
+
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Heart Rate Variability</Text>
+            <View style={styles.cardContentContainer}>
+              <Text style={styles.cardContent}>
+                {heartRateVariability !== null ? `${heartRateVariability} ms` : 'No data sent yet'}
+              </Text>
+              <ProgressBar progress={hrvProgress} color="#A0D9D3" style={styles.progressBar} />
+            </View>
+          </Card>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.addDataButton} onPress={addNewData}>
+              <Text style={styles.buttonText}>Add Data</Text>
+            </TouchableOpacity>
+            <Link href="./calendar" style={styles.linkButton}>
+              <Text style={styles.linkButtonText}>History</Text>
+            </Link>
+            <Link href="./dailyquiz" style={styles.linkButton}>
+              <Text style={styles.linkButtonText}>Daily quiz</Text>
+            </Link>
+            <Link href="../bluetooth" style={styles.linkButton}>
+              <Text style={styles.linkButtonText}>Bluetooth Scanner</Text>
+            </Link>
           </View>
-        </Card>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.addDataButton} onPress={addNewData}>
-            <Text style={styles.buttonText}>Add Data</Text>
-          </TouchableOpacity>
-          <Link href="./calendar" style={styles.linkButton}>
-            <Text style={styles.linkButtonText}>History</Text>
-          </Link>
-          <Link href="./dailyquiz" style={styles.linkButton}>
-            <Text style={styles.linkButtonText}>Daily quiz</Text>
-          </Link>
-        </View>
+        </ScrollView>
       </LinearGradient>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#A0D9D3',
+  },
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    padding: 20,
   },
   gradientBackground: {
     flex: 1,
-    borderRadius: 20,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
     padding: 20,
   },
   logoContainer: {

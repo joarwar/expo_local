@@ -32,7 +32,8 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
-        <Stack.Screen name ="about" options={{title: 'Daily Quiz'}} />
+        <Stack.Screen name="about" options={{ title: 'Daily Quiz' }} />
+        <Stack.Screen name="bluetooth" options={{ title: 'Bluetooth Scanner' }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

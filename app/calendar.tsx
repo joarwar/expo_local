@@ -71,7 +71,7 @@ export default function History() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
       <Text style={styles.title}>View History by Date</Text>
       <Calendar
         markedDates={markedDates}
@@ -89,7 +89,7 @@ export default function History() {
         }}
       />
 
-      <ScrollView style={styles.scrollContainer}>
+      <View style={styles.scrollContainer}>
         {history.length > 0 ? (
           history.map((entry, index) => (
             <View key={index} style={styles.historyItem}>
@@ -107,20 +107,20 @@ export default function History() {
         ) : (
           <Text style={styles.noDataText}>No data available</Text>
         )}
-      </ScrollView>
+      </View>
 
       <Link href="./" style={styles.goBack}>
         Go back
       </Link>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     padding: 20,
-    backgroundColor: '#F4F4F9', 
+    backgroundColor: '#F4F4F9',
     borderRadius: 12,
     elevation: 3,
   },

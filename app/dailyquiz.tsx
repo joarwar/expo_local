@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 
 export default function DailyQuiz() {
@@ -79,19 +79,19 @@ export default function DailyQuiz() {
 
   if (isQuizFinished) {
     return (
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Quiz Result</Text>
         <Text style={styles.result}>{`Your baseline result is: ${result}`}</Text>
         <Text style={styles.explanation}>{explanation}</Text>
         <Link href="./" style={styles.goBack} onPress={resetQuiz}>
           Go back
         </Link>
-      </View>
+      </ScrollView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
       <Text style={styles.title}>Daily Quiz</Text>
       <Text style={styles.question}>{questions[questionIndex].question}</Text>
 
@@ -108,14 +108,13 @@ export default function DailyQuiz() {
       </View>
 
       <Text style={styles.progress}>Question {questionIndex + 1} of {questions.length}</Text>
-    </View>
+    </ScrollView>
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
