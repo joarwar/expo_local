@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
 import { getDatabase, ref, get } from "firebase/database";
-import { database } from '@/app/firebaseConfig';
+import { database } from '../config/firebaseConfig';
 import { Calendar } from 'react-native-calendars';
 
 type MarkedDates = {

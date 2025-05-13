@@ -32,7 +32,7 @@ export const BluetoothScanner = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bluetooth Scanner</Text>
+      <Text style={styles.title}>Bluetooth </Text>
       
       {error && <Text style={styles.error}>{error}</Text>}
       

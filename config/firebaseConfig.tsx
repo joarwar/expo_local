@@ -1,4 +1,4 @@
-// app/firebaseConfig.tsx
+// config/firebaseConfig.tsx
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
@@ -16,5 +16,10 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const database = getDatabase(app);
 
-//  Export both
+// Export both
 export { app, database };
+
+// Add default export to satisfy Expo Router
+export default function FirebaseConfig() {
+  return null;
+}

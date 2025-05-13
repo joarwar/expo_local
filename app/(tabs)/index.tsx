@@ -4,7 +4,7 @@ import { Card, ProgressBar } from 'react-native-paper';
 import { Link } from 'expo-router';
 import { Image } from 'expo-image';
 import { ref, set, push } from "firebase/database";
-import { database } from '@/app/firebaseConfig';
+import { database } from '../../config/firebaseConfig';
 import { LinearGradient } from 'expo-linear-gradient'; 
 import { BleManager } from 'react-native-ble-plx';
 import { Buffer } from 'buffer';
